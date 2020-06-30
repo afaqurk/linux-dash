@@ -35,7 +35,7 @@ angular.module('linuxDash').directive('lineChartPlugin', [
             borderVisible: false,
             sharpLines: true,
             grid: {
-              fillStyle: '#ffffff',
+              fillStyle: '#121212',
               strokeStyle: 'rgba(232,230,230,0.93)',
               sharpLines: true,
               millisPerLine: 3000,

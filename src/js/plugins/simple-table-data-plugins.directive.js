@@ -90,6 +90,10 @@ var simpleTableModules = [
   {
     name: 'cronHistory',
     template: '<table-data heading="Cron Job History" module-name="cron_history" info="Crons which have run recently."></table-data>'
+  },
+  {
+    name: 'supervisorStatus',
+    template: '<table-data heading="Supervisor" module-name="supervisor_status" info="Shows active supervisor processes"></table-data>'
   }
 ]
 

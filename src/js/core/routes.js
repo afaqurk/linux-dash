@@ -74,6 +74,16 @@ function routesFn($routeProvider) {
         '<pm2 sortablejs-id="pm2"></pm2>',
       ].join(''),
     })
+
+    .when('/custom', {
+      template: [
+        '<server-accounts sortablejs-id="server-accounts"></server-accounts> ',
+        '<logged-in-accounts sortablejs-id="logged-in"></logged-in-accounts> ',
+        '<recent-logins sortablejs-id="recent"></recent-logins> ',
+        '<supervisor sortablejs-id="supervisor"></supervisor> ',
+      ].join(''),
+    })
+
     .otherwise({
       redirectTo: '/loading'
     })

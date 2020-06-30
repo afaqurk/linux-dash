@@ -12,7 +12,9 @@ PS=$(type -P ps)
 
 _parseAndPrint() {
   while read data; do
-    $ECHO -n "$data" | $SED -r 's/\\//g' | $TR -d "\n";
+#  $ECHO -n "$data" | $SED -r "s/\"/\\\\\"/g" | $TR -d "\n"; 
+$ECHO -n "$data" | $SED -r 's/\\//g' | $TR -d "\n";
+#echo $data
   done;
 }
 
@@ -184,6 +186,17 @@ disk_partitions() {
   $ECHO [ ${result%?} ] | _parseAndPrint
 }
 
+#plugin supervisor
+
+supervisor_status() {
+  local spvCommand=$(type -P supervisorctl)
+
+  result=$($spvCommand status | xargs 'NR>1 {print "{\"file_system\": \"" $1 "\", \"size\": \"" $2 "\", \"used\": \"" $3 "\", \"avail\": \"" $4 "\", \"used%\": \"" $5 "\", \"mounted\": \"" $6 "\"},"}')
+
+  $ECHO { ${result%?} } | _parseAndPrint
+}
+
+
 docker_processes() {
 
   local result=""
@@ -338,8 +351,8 @@ memcached() {
 memory_info() {
 
   $CAT /proc/meminfo \
-    | $AWK -F: 'BEGIN {print "{"} {print "\"" $1 "\": \"" $2 "\"," } END {print "}"}' \
-    | $SED 'N;$s/,\n/\n/;P;D' \
+    | $AWK -F: 'BEGIN {print "{"} {print "\"" $1 "\": \"" $2 "\"," } END {print "\""$1"\":\"" $2 "\"}" }' \
+    | $SED 'N;$s/\n/\n/;P;D' \
     | _parseAndPrint
 }
 
@@ -421,6 +434,25 @@ pm2_stats() {
 			{print "},"}')
 		#make sure to remove last comma and print in array
 		$ECHO "[" ${json%?} "]" | _parseAndPrint
+	else
+		#no data found
+		$ECHO "[]" | _parseAndPrint
+	fi
+}
+
+supervisor_status() {
+
+	#get data
+	local data="$(sudo supervisorctl status)"
+    local tailCommand=$(type -P tail)
+
+	if [ -n "$data" ]; then
+
+		json=$( $ECHO "$data" \
+		| $AWK '{print "{\"process\": \""$1"\",\"status\": \"" $2 "\",\"pid\": \"" $4 "\",\"uptime\": \"" $6 "\"\},"}')
+		#make sure to remove last comma and print in array
+		#$ECHO "[" ${json%?} "]" | _parseAndPrint
+    $ECHO ${json} | _parseAndPrint
 	else
 		#no data found
 		$ECHO "[]" | _parseAndPrint
@@ -553,11 +585,11 @@ scheduled_crons() {
     $CAT "${temp}" \
         | $AWK 'BEGIN {print "["} \
                     {print "{ \"min\": \"" $1 \
-                    "\", \"hrs\": \"" $2 "\", " \
-                    " \"day\": \"" $3 "\", " \
-                    " \"month\": \"" $4 "\", " \
-                    " \"wkday\": \"" $5 "\", " \
-                    " \"user\": \"" $6 "\", " \
+                    "\", \"hrs\": \"" $2 "\"," \
+                    " \"day\": \"" $3 "\"," \
+                    " \"month\": \"" $4 "\"," \
+                    " \"wkday\": \"" $5 "\"," \
+                    " \"user\": \"" $6 "\"," \
                     " \"CMD\": \""} \
                         {for(i=7;i<=NF;++i) printf("%s ", gensub("\"", "\\\\\"", "g", $i) ) } \
                     {print "\" " \

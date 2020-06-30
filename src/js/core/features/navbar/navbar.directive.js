@@ -23,6 +23,7 @@ angular.module('linuxDash').directive('navBar', ['$location', function($location
         'network',
         'accounts',
         'apps'
+        'custom'
       ]
 
       scope.getNavItemName = function(url) {

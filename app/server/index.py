@@ -36,7 +36,7 @@ class MainHandler(BaseHTTPRequestHandler):
                     self.path = 'index.html'
                 f = open(appRootPath + os.sep + self.path)
                 data = f.read()
-                if self.path.startswith('/linuxDash.min.css'):
+                if self.path.startswith('/linuxDash.min.darkmode.cyan.css'):
                     contentType = 'text/css'
                 f.close()
             self.send_response(200)
